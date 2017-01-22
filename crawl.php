@@ -7,19 +7,13 @@ for ($z=1;$z<141;$z++)
 
     $file = file_get_contents("http://www.food.com/recipe?categories=265&pn=$z","r");
     
-    //$file = file_get_contents("http://www.food.com/search/vegetarian+soup?pn=$z","r");
-
-    // echo $file;
-
-    // preg_match('var searchResults = '/(.*?)/',$file,$display);
     $start = stripos($file,"var searchResults = ");
 
     $end = stripos($file,'"pageview_candidate"};');
     $length = ($end-$start)+1;
     // echo $length;
     $jsondata = substr($file,$start+20,$length);
-     //echo $jsondata;
-    // var_dump(json_decode($jsondata, true));
+    
 
     $json_array = json_decode($jsondata, true);
     $numRecords=$json_array['response']['parameters']['numRecords'];
@@ -37,7 +31,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-    //print_r($json_array['response']['results'][$y]['record_url']); 
+
 
 //Gives needed data
 $main_num_ratings=$json_array['response']['results'][$y]['main_num_ratings'];
@@ -48,47 +42,31 @@ $recipe_id=$json_array['response']['results'][$y]['recipe_id'];
 $main_title=$json_array['response']['results'][$y]['main_title']; 
 $main_title=str_replace("'"," ",$main_title);
 $main_title=str_replace("/"," ",$main_title);
-//$primary_category_name=$json_array['response']['results'][$y]['primary_category_name']; 
-//$all_category_list=$json_array['response']['results'][$y]['all_category_list'];
-//$all_ingredients=$json_array['response']['results'][$y]['all_ingredients']; 
 $num_steps=$json_array['response']['results'][$y]['num_steps'];
 $main_submit_date=$json_array['response']['results'][$y]['main_submit_date'];
 $submitdate=date("Y-m-d",$main_submit_date);
-//print_r($submitdate);
-//print_r($json_array['response']['results'][0]['num_steps']); 
 $recipe_preptime=$json_array['response']['results'][$y]['recipe_preptime']; 
 $recipe_totaltime=$json_array['response']['results'][$y]['recipe_totaltime']; 
 $recipe_cooktime=$json_array['response']['results'][$y]['recipe_cooktime']; 
 $time='recipe_preptime='.$recipe_preptime.','.'recipe_totaltime='.$recipe_totaltime.','.'recipe_cooktime='.$recipe_cooktime;
-//print_r($time);
-//$main_truncated_title=$json_array['response']['results'][$y]['main_truncated_title']; 
-//$latest_modtime=$json_array['response']['results'][$y]['latest_modtime'];
-
-//main_rating
 $main_rating=$json_array['response']['results'][$y]['main_rating'];
 
-//print_r($max_rating_recipe);
 
-    
-
+   
 $file1 = file_get_contents($url);
 //print_r($file1);
 
 //$keywords
 $start2 = stripos($file1,'"keywords":');
 $end2 = stripos($file1,'","SctnDspName');
-//print_r("key=");
-//print_r($end2);
 $length2 = ($end2-$start2)-12;
 $keywords = substr($file1,$start2+12,$length2);
-//print_r($keywords);
+
 
 
 //$keywordids
 $start2 = stripos($file1,'"keywordids":');
 $end2 = stripos($file1,'","keywords');
-//print_r("key=");
-//print_r($end2);
 $length2 = ($end2-$start2)-14;
 $keywordids = substr($file1,$start2+14,$length2);
 //print_r($keywordids);
@@ -96,8 +74,6 @@ $keywordids = substr($file1,$start2+14,$length2);
 //ingridients
 $start2 = stripos($file1,',"ingredients":');
 $end2 = stripos($file1,'","keywordids"');
-//print_r("key=");
-//print_r($end2);
 $length2 = ($end2-$start2)-16;
 $ingridients = substr($file1,$start2+16,$length2);
 //print_r($ingridients);
@@ -113,9 +89,7 @@ $length = ($end-$start)+4;
 
     $jsondata1 = substr($file1,$start+7,$length);
     $jsondata1 = strip_tags($jsondata1);
-	// print_r($jsondata1);
-	// var_dump($jsondata1);
-	// var_dump(json_decode($jsondata1, true));
+
 
     $json_array1 = json_decode($jsondata1, true);
    //nutrition contents
@@ -159,9 +133,7 @@ $fpjson = fopen('datajson.js', 'w');
 	// fwrite($fp, '1');
 	fwrite($fp1, $file1);
 	$sql = "INSERT INTO recipes(recipeId,recipename,average_rating,ingredients,features,feature_id,time,recipeinstruction,nutrition,no_of_steps,c_date)VALUES($recipe_id,'$main_title',$main_rating,'$ingridients','$keywords','$keywordids','$time','".$recipeInstructions."','$nutrition',$num_steps,'$submitdate')";
-	//$sql = "INSERT INTO recipes(recipeId,recipename,ingredients,features,feature_id,time,recipeinstruction,nutrition,no_of_steps) VALUES($recipe_id,'$main_title','$ingridients','$keywords','$keywordids','$time','$recipeInstructions',$num_steps)";
-//$query="INSERT INTO recipes(recipename)VALUES('1')";
-//$s    = mysqli_query($query, $connect);
+	
 
 if ($conn->query($sql) === TRUE) {
    
@@ -175,15 +147,6 @@ $conn->close();
 }
 	
 
-	// if(!$fp = fopen("http://www.food.com/recipe/roasted-asparagus-50847" ,"r" )) {
-	// 	return false;
-	// } //our fopen is right, so let's go
-	// $content = "";
-
-	// while(!feof($fp)) { //while it is not the last line, we will add the current line to our $content
-	// 	$content .= fgets($fp, 1024);
-	// }
-	// echo $content;
-	// fclose($fp); //we are done here, don't need the main source anymore
+	
 }
 ?>
